@@ -1,0 +1,175 @@
+{
+  "app": "study-desk",
+  "schemaVersion": 2,
+  "exportedAt": "2026-10-08T16:03:13.667Z",
+  "exportedAtLocal": "2026-10-09 00:03",
+  "data": {
+    "schemaVersion": 2,
+    "createdAt": 1790963622381,
+    "updatedAt": 1791475382222,
+    "app": "study-desk",
+    "settings": {
+      "theme": "system",
+      "hardcore": false,
+      "quote": true
+    },
+    "goals": [
+      {
+        "id": "mur9hzalfps3gg",
+        "name": "资料分析",
+        "type": "duration",
+        "period": "day",
+        "target": 60,
+        "unit": "分钟",
+        "poster": "aurora",
+        "accent": "#2f6bff",
+        "note": "刷题+复盘",
+        "origin": "sample",
+        "edited": true,
+        "createdAt": 1790963622381
+      },
+      {
+        "id": "mur9hzamv3tyr5",
+        "name": "言语理解",
+        "type": "duration",
+        "period": "day",
+        "target": 60,
+        "unit": "分钟",
+        "poster": "berry",
+        "accent": "#e0568f",
+        "note": "",
+        "origin": "sample",
+        "edited": true,
+        "createdAt": 1790963622382
+      },
+      {
+        "id": "mur9hzam7xrlxl",
+        "name": "判断推理",
+        "type": "duration",
+        "period": "day",
+        "target": 60,
+        "unit": "分钟",
+        "poster": "ocean",
+        "accent": "#0ea5e9",
+        "note": "",
+        "origin": "sample",
+        "edited": true,
+        "createdAt": 1790963622382
+      },
+      {
+        "id": "mur9hzamjs9sro",
+        "name": "政治理论",
+        "type": "duration",
+        "period": "day",
+        "target": 60,
+        "unit": "分钟",
+        "poster": "ridge",
+        "accent": "#12a594",
+        "note": "",
+        "origin": "sample",
+        "edited": true,
+        "createdAt": 1790963622382
+      },
+      {
+        "id": "mur9hzamq6m3d0",
+        "name": "模拟测试",
+        "type": "duration",
+        "period": "week",
+        "target": 120,
+        "unit": "分钟",
+        "poster": "night",
+        "accent": "#7a5cff",
+        "note": "",
+        "origin": "sample",
+        "edited": true,
+        "createdAt": 1790963622382
+      }
+    ],
+    "sessions": [
+      {
+        "id": "murui3782v7ldo",
+        "goalId": "mur9hzamv3tyr5",
+        "start": 1790994351380,
+        "end": 1790998899380,
+        "seconds": 4548,
+        "date": "2026-10-03",
+        "manual": false,
+        "origin": "user"
+      },
+      {
+        "id": "musm3hov59rmy4",
+        "goalId": "mur9hzamv3tyr5",
+        "start": 1791034912567,
+        "end": 1791045247567,
+        "seconds": 10335,
+        "date": "2026-10-03",
+        "manual": false,
+        "origin": "user"
+      },
+      {
+        "id": "mutjj2thgfl2ip",
+        "goalId": "mur9hzalfps3gg",
+        "start": 1791099112117,
+        "end": 1791101402117,
+        "seconds": 2290,
+        "date": "2026-10-04",
+        "manual": false,
+        "origin": "user"
+      },
+      {
+        "id": "mutvayq0tt587z",
+        "goalId": "mur9hzamq6m3d0",
+        "start": 1791101409952,
+        "end": 1791121178952,
+        "seconds": 19769,
+        "date": "2026-10-04",
+        "manual": false,
+        "origin": "user"
+      },
+      {
+        "id": "muu2si9107pt86",
+        "goalId": "mur9hzamq6m3d0",
+        "start": 1791127164725,
+        "end": 1791133754725,
+        "seconds": 6590,
+        "date": "2026-10-04",
+        "manual": false,
+        "origin": "user"
+      },
+      {
+        "id": "muy0pxad9sa8c5",
+        "goalId": "mur9hzam7xrlxl",
+        "start": 1791366936717,
+        "end": 1791372139717,
+        "seconds": 5203,
+        "date": "2026-10-07",
+        "manual": false,
+        "origin": "user"
+      },
+      {
+        "id": "muy9kjerxl7bfm",
+        "goalId": "mur9hzamv3tyr5",
+        "start": 1791384978995,
+        "end": 1791387004995,
+        "seconds": 2026,
+        "date": "2026-10-07",
+        "manual": false,
+        "origin": "user"
+      },
+      {
+        "id": "muzky8q4p4bmn9",
+        "goalId": "mur9hzam7xrlxl",
+        "start": 1791442808284,
+        "end": 1791466586284,
+        "seconds": 23778,
+        "date": "2026-10-08",
+        "manual": false,
+        "origin": "user"
+      }
+    ],
+    "meta": {
+      "initialized": true,
+      "seededAt": 1790963622384
+    }
+  }
+}
