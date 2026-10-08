@@ -1,0 +1,18 @@
+# WorkBuddy 内部元数据（与本项目源码无关）
+.workbuddy/
+.workbuddy-ai/
+.wbapp_*.genie
+
+# Windows / macOS 系统文件
+desktop.ini
+Thumbs.db
+.DS_Store
+
+# 编辑器
+.vscode/
+.idea/
+*.swp
+
+# 依赖与构建产物
+node_modules/
+dist/
