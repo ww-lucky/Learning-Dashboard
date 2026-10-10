@@ -8,11 +8,17 @@
 
 ## 在线版（可安装到手机主屏幕）
 
-**https://09db56bcee8944149e243bac5c1fc74b.sg.agentos-app.run**
+**https://ww-lucky.github.io/Learning-Dashboard/**
 
 手机 Chrome 打开 → 右上角 **⋮** → **安装应用**。装完是隐藏地址栏的独立应用，断网也能打开。
 
-> 链接由云端沙箱托管，随时可能失效。要长期保留请用下面的本地版，或自己 fork 后重新部署。
+地址由 GitHub Pages 提供，**永久不变**；`docs/` 目录一有更新就会自动重新部署。
+
+> ⚠️ 首次使用前需在仓库 **Settings → Pages** 把 Source 设为 `Deploy from a branch` →
+> `main` / `/docs`，等 1~2 分钟生效。
+>
+> ⚠️ 数据存在**浏览器本地**，且绑定在「访问的那个网址」上。换域名或换设备都**不会**自动同步——
+> 请定期用 App 里的「设置 → 导出 JSON」备份，恢复时导入即可。
 
 ## 本地版（单个 HTML 文件）
 
@@ -41,14 +47,15 @@
 
 ```
 学习工作台.html            单文件版 —— 唯一源码，本地直接可用
-构建发布目录.js            构建脚本 —— 生成下面的 发布/ 目录
-发布/                      托管版
+构建发布目录.js            构建脚本 —— 生成下面的 docs/ 目录
+docs/                      托管版（GitHub Pages 的发布源）
   ├─ index.html              单文件版 + 静态 manifest 引用
   ├─ manifest.webmanifest    PWA manifest
   ├─ sw.js                   Service Worker（离线缓存）
   ├─ icon-192.png
   ├─ icon-512.png
-  └─ icon-maskable-512.png
+  ├─ icon-maskable-512.png
+  └─ .nojekyll               让 Pages 跳过 Jekyll 处理
 备份/                      数据备份（App 里「导出 JSON」的产物）
   ├─ README.md               备份说明与恢复步骤
   └─ 学习工作台-YYYY-MM-DD.json
@@ -72,8 +79,10 @@ App 的数据存在浏览器 `localStorage` 里，**绑定在你访问的那个�
 node 构建发布目录.js
 ```
 
-会重新生成整个 `发布/` 目录。图标是用**纯 Node 手写的 PNG 编码器**（内置 `zlib` + 自实现
+会重新生成整个 `docs/` 目录。图标是用**纯 Node 手写的 PNG 编码器**（内置 `zlib` + 自实现
 CRC32）现场画出来的，**没有任何 npm 依赖**，不需要 `npm install`。
+
+重新构建后 push 到 `main`，GitHub Pages 会自动重新部署，**地址不变**。
 
 ## 技术要点
 

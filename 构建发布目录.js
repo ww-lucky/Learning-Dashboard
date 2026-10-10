@@ -1,22 +1,27 @@
 /* ============================================================
-   构建「发布」目录
+   构建「docs」目录
    用法：node 构建发布目录.js
    作用：以 学习工作台.html（单文件版）为唯一源，
-        生成 发布/ 目录（可托管版）：
+        生成 docs/ 目录（可托管版）：
           index.html              注入静态 manifest 引用
           manifest.webmanifest    真实 manifest 文件
           sw.js                   Service Worker（离线 + 安装提示）
           icon-192.png            PWA 图标
           icon-512.png
           icon-maskable-512.png
-   改完 学习工作台.html 后重跑本脚本，再重新发布即可。
+          .nojekyll               让 GitHub Pages 跳过 Jekyll 处理
+   目录名用 docs/ 是为了直接对接 GitHub Pages：
+   仓库 Settings → Pages → Source 选 main / docs，
+   线上地址即 https://<用户名>.github.io/<仓库名>/
+
+   改完 学习工作台.html 后重跑本脚本，再 push 即可（Pages 会自动重新部署）。
    ============================================================ */
 const fs = require('fs');
 const path = require('path');
 const zlib = require('zlib');
 
 const ROOT = __dirname;
-const OUT = path.join(ROOT, '发布');
+const OUT = path.join(ROOT, 'docs');
 const SRC = path.join(ROOT, '学习工作台.html');
 
 /* ============ 1. 极简 PNG 编码器（仅用内置 zlib） ============ */
@@ -198,10 +203,15 @@ self.addEventListener('fetch', function(e){
 });
 `, 'utf8');
 
-/* 3.5 汇报 */
+/* 3.5 .nojekyll —— 让 GitHub Pages 原样输出，不做 Jekyll 处理 */
+fs.writeFileSync(path.join(OUT, '.nojekyll'), '', 'utf8');
+
+/* 3.6 汇报 */
 console.log('源文件: 学习工作台.html');
-console.log('输出目录: 发布/\n');
+console.log('输出目录: docs/\n');
 fs.readdirSync(OUT).sort().forEach(f => {
   console.log('  ' + f.padEnd(26) + (fs.statSync(path.join(OUT, f)).size / 1024).toFixed(1) + ' KB');
 });
-console.log('\n完成。重新发布：调用 workbuddy_sites_deploy，directory 指向 发布/');
+console.log('\n完成。');
+console.log('  · GitHub Pages：git push 后自动重新部署，地址不变');
+console.log('  · 若要用 WorkBuddy 沙箱托管：workbuddy_sites_deploy 的 directory 指向 docs/');
