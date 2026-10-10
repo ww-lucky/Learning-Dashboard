@@ -151,7 +151,7 @@ fs.writeFileSync(path.join(OUT, 'manifest.webmanifest'), JSON.stringify({
 
 /* 3.4 sw.js */
 fs.writeFileSync(path.join(OUT, 'sw.js'), `/* 学习工作台 Service Worker —— 离线可用 */
-var CACHE = 'study-desk-v1';
+var CACHE = 'study-desk-v2';
 var ASSETS = ['./', './index.html', './manifest.webmanifest',
   './icon-192.png', './icon-512.png', './icon-maskable-512.png'];
 
@@ -169,11 +169,20 @@ self.addEventListener('fetch', function(e){
   if (req.method !== 'GET') return;
   if (new URL(req.url).origin !== self.location.origin) return;
   if (req.mode === 'navigate'){
-    e.respondWith(fetch(req).then(function(res){
-      var copy = res.clone();
-      caches.open(CACHE).then(function(c){ c.put('./index.html', copy); });
-      return res;
-    }).catch(function(){ return caches.match('./index.html'); }));
+    e.respondWith(
+      fetch(req).then(function(res){
+        // 只在响应正常时更新缓存。服务器返回 4xx/5xx（例如域名被回收后网关报 400）时
+        // 绝不能拿错误页覆盖已缓存的 App，否则已安装的应用会被一个错误页替换掉。
+        if (res && res.ok){
+          var copy = res.clone();
+          caches.open(CACHE).then(function(c){ c.put('./index.html', copy); });
+          return res;
+        }
+        return caches.match('./index.html').then(function(hit){ return hit || res; });
+      }).catch(function(){
+        return caches.match('./index.html');
+      })
+    );
     return;
   }
   e.respondWith(caches.match(req).then(function(hit){
