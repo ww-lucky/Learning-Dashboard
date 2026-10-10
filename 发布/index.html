@@ -261,9 +261,41 @@ select.input{appearance:none;-webkit-appearance:none;background-image:none;paddi
 .hero-actions{margin-left:auto;display:flex;gap:2px}
 .hero-actions .icon-btn{color:#fff}
 .hero-actions .icon-btn:hover{background:rgba(255,255,255,.18);color:#fff}
-.hero-body{margin-top:22px;position:relative;z-index:2}
+.hero-body{margin-top:22px;position:relative;z-index:2;display:flex;align-items:flex-start;gap:12px}
+.hero-text{flex:1 1 auto;min-width:0}
 .hero-body h1{font-size:22px;font-weight:750;letter-spacing:-.02em}
 .hero-body p{font-size:13px;opacity:.88;margin-top:4px;font-weight:500}
+
+/* ---------- 倒数日 chip（hero 右上角） ---------- */
+.cd-chip{
+  flex:0 0 auto;max-width:45%;display:flex;flex-direction:column;align-items:flex-end;gap:1px;
+  padding:7px 12px 8px;border-radius:13px;color:#fff;text-align:right;
+  background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.26);
+  -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
+  transition:background .15s,transform .12s,border-color .15s;
+}
+.cd-chip:hover{background:rgba(255,255,255,.26)}
+.cd-chip:active{transform:scale(.96)}
+.cd-chip .cd-name{
+  font-size:11.5px;font-weight:650;opacity:.92;line-height:1.25;
+  max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.cd-chip .cd-days{
+  font-size:11.5px;font-weight:600;opacity:.85;line-height:1.2;white-space:nowrap;
+}
+.cd-chip .cd-days b{
+  font-size:19px;font-weight:750;letter-spacing:-.02em;font-variant-numeric:tabular-nums;
+  opacity:1;margin:0 1px;
+}
+.cd-chip.today .cd-days b{font-size:14px}
+.cd-chip.soon{background:rgba(255,214,102,.24);border-color:rgba(255,214,102,.55)}
+.cd-chip.urgent{background:rgba(255,132,132,.30);border-color:rgba(255,150,150,.62)}
+.cd-chip.past{opacity:.6}
+.cd-chip.empty{
+  flex-direction:row;align-items:center;gap:5px;padding:8px 12px;
+  font-size:12.5px;font-weight:650;
+}
+.cd-chip.empty .ic{opacity:.9}
 
 .goal-grid{display:grid;gap:14px;grid-template-columns:1fr}
 .gcard{
@@ -307,6 +339,29 @@ select.input{appearance:none;-webkit-appearance:none;background-image:none;paddi
 .empty{padding:34px 18px;text-align:center;color:var(--text-3)}
 .empty .ic{width:38px;height:38px;margin:0 auto 10px;opacity:.5;stroke-width:1.5}
 .empty b{display:block;color:var(--text-2);font-size:14.5px;margin-bottom:4px}
+
+/* ---------- 倒数日列表（弹层内） ---------- */
+.cd-list{display:flex;flex-direction:column;gap:8px}
+.cd-item{
+  display:flex;align-items:center;gap:11px;padding:11px 12px;
+  border-radius:13px;background:var(--bg-sunken);border:1px solid var(--line);
+}
+.cd-item.past{opacity:.55}
+.cd-badge{
+  flex:0 0 auto;min-width:58px;padding:6px 9px;border-radius:10px;text-align:center;
+  background:var(--bg-elev);border:1px solid var(--line);line-height:1.1;
+}
+.cd-badge b{display:block;font-size:18px;font-weight:750;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.cd-badge span{display:block;font-size:10px;color:var(--text-3);font-weight:650;margin-top:1px}
+.cd-badge.soon b{color:var(--warn)}
+.cd-badge.urgent b{color:var(--danger)}
+.cd-badge.past b{color:var(--text-3)}
+.cd-info{flex:1 1 auto;min-width:0}
+.cd-info b{display:block;font-size:14px;font-weight:650;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cd-info span{display:block;font-size:11.5px;color:var(--text-3);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cd-empty{padding:26px 14px;text-align:center;color:var(--text-3);font-size:13px;line-height:1.7}
+.cd-empty .ic{width:32px;height:32px;margin:0 auto 10px;opacity:.45;stroke-width:1.5}
+.cd-item .icon-btn{width:34px;height:34px;border-radius:10px}
 
 /* ---------- 海报（纯 CSS 渐变 + 内联 SVG，无外部图片） ---------- */
 .poster-aurora{background:
@@ -710,8 +765,11 @@ body.storage-warn .toasts{top:calc(var(--safe-t) + 118px)}
             </div>
           </div>
           <div class="hero-body">
-            <h1>我的学习目标</h1>
-            <p id="heroSummary">今日 0 分钟 · 0 次专注</p>
+            <div class="hero-text">
+              <h1>我的学习目标</h1>
+              <p id="heroSummary">今日 0 分钟 · 0 次专注</p>
+            </div>
+            <button class="cd-chip empty" id="cdChip" title="倒数日" aria-label="倒数日"></button>
           </div>
         </div>
         <div class="section-head"><h2>目标</h2><span class="sub" id="goalCount"></span></div>
@@ -974,8 +1032,10 @@ body.storage-warn .toasts{top:calc(var(--safe-t) + 118px)}
 'use strict';
 
 /* ---------------- 常量 ---------------- */
+/* 存储键名保持不变：改名会让浏览器里已有的数据读不到。
+   数据结构版本由 SCHEMA 与下面的 MIGRATIONS 链管理，与键名无关。 */
 var LS_KEY      = 'studyDesk.v2';
-var SCHEMA      = 2;
+var SCHEMA      = 3;
 var LEGACY_KEYS = ['studyDesk','studyDesk.v1','studyDeskData','studyTimer','pomodoroData','focusTracker','studyRecord'];
 var SVGNS       = 'http://www.w3.org/2000/svg';
 
@@ -1092,7 +1152,19 @@ function blankDB(){
     settings: { theme:'system', hardcore:false, quote:true },
     goals: [],
     sessions: [],
+    countdowns: [],
     meta: { initialized:false }
+  };
+}
+
+function mkCountdown(o){
+  o = o || {};
+  return {
+    id: uid(),
+    name: String(o.name || '未命名').slice(0, 20),
+    date: /^\d{4}-\d{2}-\d{2}$/.test(String(o.date)) ? String(o.date) : dayKey(new Date()),
+    note: String(o.note || '').slice(0, 40),
+    createdAt: num(o.createdAt, Date.now())
   };
 }
 
@@ -1226,8 +1298,27 @@ function normalize(raw){
     });
   });
 
+  // 倒数日
+  var cdSeen = {};
+  (Array.isArray(raw.countdowns) ? raw.countdowns : []).forEach(function(c){
+    if (!c || typeof c !== 'object') return;
+    var name = String(c.name || '').trim();
+    if (!name) return;                                    // 无名称的丢弃
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(String(c.date))) return; // 日期非法则丢弃
+    var cid = c.id ? String(c.id) : uid();
+    if (cdSeen[cid]) cid = uid();
+    cdSeen[cid] = 1;
+    db.countdowns.push({
+      id: cid,
+      name: name.slice(0, 20),
+      date: String(c.date),
+      note: String(c.note || '').slice(0, 40),
+      createdAt: num(c.createdAt, Date.now())
+    });
+  });
+
   // 保留未知顶层字段，避免升级时静默丢数据
-  var known = {schemaVersion:1, createdAt:1, updatedAt:1, app:1, settings:1, goals:1, sessions:1, meta:1};
+  var known = {schemaVersion:1, createdAt:1, updatedAt:1, app:1, settings:1, goals:1, sessions:1, countdowns:1, meta:1};
   var extra = {};
   Object.keys(raw).forEach(function(k){ if (!known[k]) extra[k] = raw[k]; });
   if (Object.keys(extra).length) db.meta.extra = extra;
@@ -1279,6 +1370,24 @@ var MIGRATIONS = {
         seconds: sec, date: dayKey(start), manual: !!s.manual, origin: 'user'
       });
     });
+    return out;
+  },
+
+  /* v2 -> v3：新增倒数日 countdowns 字段。其余结构不变，补齐空数组即可，
+     具体字段的合法性由 normalize() 兜底。 */
+  2: function(d){
+    var out = blankDB();
+    out.createdAt = num(d.createdAt, Date.now());
+    out.updatedAt = num(d.updatedAt, Date.now());
+    if (d.app) out.app = String(d.app);
+    if (d.settings && typeof d.settings === 'object') Object.assign(out.settings, d.settings);
+    if (d.meta && typeof d.meta === 'object') out.meta = Object.assign({}, d.meta, {initialized:true});
+
+    out.goals = Array.isArray(d.goals) ? d.goals.slice() : [];
+    out.sessions = Array.isArray(d.sessions) ? d.sessions.slice() : [];
+    out.countdowns = Array.isArray(d.countdowns) ? d.countdowns.slice() : [];
+
+    out.schemaVersion = SCHEMA;
     return out;
   }
 };
@@ -1594,6 +1703,7 @@ function renderGoals(){
   list.innerHTML = '';
   $('#goalEmpty').hidden = DB.goals.length > 0;
   DB.goals.forEach(function(g){ list.appendChild(goalCard(g)); });
+  renderCountdownChip();
   renderSideStat();
 }
 
@@ -1734,6 +1844,223 @@ function deleteGoal(g){
     save(); renderGoals(); renderSideStat();
     toast('已删除', 'ok');
   });
+}
+
+/* ============================================================
+   倒数日
+   hero 右上角只显示「距今最近的一个」，点开可看全部并增删改
+   ============================================================ */
+function cdDaysLeft(dateStr){
+  var t = startOfDay(parseDay(dateStr)).getTime();
+  var n = startOfDay(new Date()).getTime();
+  return Math.round((t - n) / 86400000);
+}
+
+function cdText(n){
+  if (n > 0)  return '还剩 ' + n + ' 天';
+  if (n === 0) return '就是今天';
+  return '已过 ' + (-n) + ' 天';
+}
+
+/* 紧急度：用于上色。urgent ≤7 天，soon ≤30 天，past 已过期 */
+function cdTone(n){
+  if (n < 0)  return 'past';
+  if (n <= 7) return 'urgent';
+  if (n <= 30) return 'soon';
+  return '';
+}
+
+function cdById(id){
+  for (var i = 0; i < DB.countdowns.length; i++){
+    if (DB.countdowns[i].id === id) return DB.countdowns[i];
+  }
+  return null;
+}
+
+/* 距离最近的一个：优先「今天或未来」里日期最早的；
+   若全部已过期，则取最近过去的那个 */
+function pickNearestCountdown(){
+  if (!DB.countdowns.length) return null;
+  var list = DB.countdowns.map(function(c){ return {c: c, n: cdDaysLeft(c.date)}; });
+  var future = list.filter(function(x){ return x.n >= 0; });
+  if (future.length){
+    future.sort(function(a,b){ return a.n - b.n || a.c.name.localeCompare(b.c.name); });
+    return future[0];
+  }
+  list.sort(function(a,b){ return b.n - a.n; });
+  return list[0];
+}
+
+var cdChipCache = '';
+function renderCountdownChip(){
+  var btn = $('#cdChip');
+  if (!btn) return;
+  var pick = pickNearestCountdown();
+  var key = pick ? (pick.c.id + '|' + pick.n + '|' + pick.c.name) : 'none';
+  if (key === cdChipCache && btn.innerHTML) return;   // 没变化就不重绘
+  cdChipCache = key;
+
+  if (!pick){
+    btn.className = 'cd-chip empty';
+    btn.innerHTML = '<svg class="ic ic-xs"><use href="#i-plus"/></svg><span>倒数日</span>';
+    btn.title = '添加倒数日';
+    return;
+  }
+
+  var n = pick.n, tone = cdTone(n);
+  btn.className = 'cd-chip' + (tone ? ' ' + tone : '') + (n === 0 ? ' today' : '');
+  var days;
+  if (n > 0)       days = '<b>' + n + '</b>天';
+  else if (n === 0) days = '<b>就是今天</b>';
+  else             days = '已过<b>' + (-n) + '</b>天';
+
+  btn.innerHTML = '<span class="cd-name">' + esc(pick.c.name) + '</span>' +
+                  '<span class="cd-days">' + days + '</span>';
+  btn.title = pick.c.name + ' · ' + pick.c.date + ' · ' + cdText(n) + '（点击查看全部）';
+}
+
+/* ---------------- 全部倒数日 ---------------- */
+function openCountdownSheet(){
+  var box = document.createElement('div');
+  openSheet({
+    title: '倒数日',
+    body: box,
+    actions: [
+      {label: '关闭', kind: 'ghost', onClick: closeLayer},
+      {label: '新增倒数日', kind: 'primary', onClick: function(){
+        closeLayer();
+        setTimeout(function(){ openCountdownEditor(null); }, 80);
+      }}
+    ]
+  });
+  fillCdList(box);
+}
+
+function fillCdList(box){
+  var list = DB.countdowns.slice().sort(function(a, b){
+    var da = cdDaysLeft(a.date), db2 = cdDaysLeft(b.date);
+    var pa = da < 0 ? 1 : 0, pb = db2 < 0 ? 1 : 0;
+    if (pa !== pb) return pa - pb;                       // 未过期的排在前面
+    return pa ? (db2 - da) : (da - db2);                 // 未过期按天数升序，已过期按天数降序
+  });
+
+  if (!list.length){
+    box.innerHTML = '<div class="cd-empty">' +
+      '<svg class="ic"><use href="#i-calendar"/></svg>' +
+      '还没有倒数日<br><span class="small">点下方「新增倒数日」，比如考试日期</span></div>';
+    return;
+  }
+
+  var wrap = document.createElement('div');
+  wrap.className = 'cd-list';
+  box.innerHTML = '';
+  box.appendChild(wrap);
+
+  list.forEach(function(c){
+    var n = cdDaysLeft(c.date), tone = cdTone(n);
+    var badge, unit;
+    if (n > 0){ badge = n; unit = '天后'; }
+    else if (n === 0){ badge = '今天'; unit = ''; }
+    else { badge = -n; unit = '天前'; }
+
+    var item = document.createElement('div');
+    item.className = 'cd-item' + (n < 0 ? ' past' : '');
+    item.innerHTML =
+      '<div class="cd-badge ' + tone + '"><b>' + badge + '</b>' + (unit ? '<span>' + unit + '</span>' : '') + '</div>' +
+      '<div class="cd-info"><b>' + esc(c.name) + '</b><span>' + esc(c.date) + (c.note ? ' · ' + esc(c.note) : '') + '</span></div>' +
+      '<button class="icon-btn" data-act="edit" aria-label="编辑"><svg class="ic ic-sm"><use href="#i-edit"/></svg></button>' +
+      '<button class="icon-btn" data-act="del" aria-label="删除"><svg class="ic ic-sm"><use href="#i-trash"/></svg></button>';
+
+    item.addEventListener('click', function(e){
+      var b = e.target.closest('[data-act]');
+      if (!b) return;
+      if (b.dataset.act === 'edit'){
+        closeLayer();
+        setTimeout(function(){ openCountdownEditor(c.id); }, 80);
+        return;
+      }
+      confirmSheet({
+        title: '删除「' + c.name + '」',
+        danger: true,
+        body: '<div class="alertbox"><svg class="ic ic-sm"><use href="#i-alert"/></svg><div>删除后无法恢复。</div></div>',
+        okLabel: '删除'
+      }).then(function(ok){
+        if (!ok) return;
+        DB.countdowns = DB.countdowns.filter(function(x){ return x.id !== c.id; });
+        save();
+        renderCountdownChip();
+        openCountdownSheet();
+        toast('已删除', 'ok');
+      });
+    });
+    wrap.appendChild(item);
+  });
+}
+
+/* ---------------- 倒数日编辑器 ---------------- */
+function openCountdownEditor(id){
+  var editing = id ? cdById(id) : null;
+  var isNew = !editing;
+  var draft = editing ? JSON.parse(JSON.stringify(editing)) : mkCountdown({date: dayKey(new Date())});
+
+  var wrap = document.createElement('div');
+  wrap.innerHTML =
+    '<div class="field"><label>名称</label>' +
+      '<input class="input" id="cdName" maxlength="20" placeholder="例如：国考笔试" autocomplete="off"></div>' +
+    '<div class="field"><label>日期</label>' +
+      '<input class="input" id="cdDate" type="date"></div>' +
+    '<div class="field" style="margin-bottom:2px"><label>备注（可选）</label>' +
+      '<input class="input" id="cdNote" maxlength="40" placeholder="例如：行测 + 申论" autocomplete="off"></div>' +
+    '<p class="hint" id="cdPreview" style="margin-top:10px"></p>';
+
+  var sheet = openSheet({
+    title: isNew ? '新增倒数日' : '编辑倒数日',
+    body: wrap,
+    actions: [
+      {label: '取消', kind: 'ghost', onClick: closeLayer},
+      {label: isNew ? '添加' : '保存', kind: 'primary', onClick: commit}
+    ]
+  });
+
+  var elName = $('#cdName', sheet), elDate = $('#cdDate', sheet), elNote = $('#cdNote', sheet);
+  elName.value = isNew ? '' : draft.name;
+  elDate.value = draft.date;
+  elNote.value = draft.note || '';
+
+  function paint(){
+    var d = elDate.value;
+    var el = $('#cdPreview', sheet);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(d)){ el.textContent = '请选择日期'; return; }
+    var n = cdDaysLeft(d);
+    el.textContent = cdText(n) + '（' + d + '）';
+  }
+  elDate.addEventListener('input', paint);
+  elDate.addEventListener('change', paint);
+
+  function commit(){
+    var name = elName.value.trim();
+    var date = elDate.value;
+    if (!name){ toast('请填写名称', 'err'); elName.focus(); return; }
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(date)){ toast('请选择日期', 'err'); elDate.focus(); return; }
+
+    if (isNew){
+      DB.countdowns.push(mkCountdown({name: name, date: date, note: elNote.value.trim()}));
+    } else {
+      var target = cdById(editing.id);
+      if (!target) return;
+      target.name = name.slice(0, 20);
+      target.date = date;
+      target.note = elNote.value.trim().slice(0, 40);
+    }
+    save();
+    renderCountdownChip();
+    closeLayer();
+    toast(isNew ? '已添加' : '已保存', 'ok');
+    setTimeout(function(){ openCountdownSheet(); }, 80);   // 回到列表，方便连续添加
+  }
+
+  paint();
+  setTimeout(function(){ if (isNew) elName.focus(); }, 120);
 }
 
 /* ---------------- 目标编辑器 ---------------- */
@@ -2446,6 +2773,7 @@ function handleImportPayload(raw, fileName){
       '<div class="h">项目</div><div class="h">当前</div><div class="h">导入后</div>' +
       '<div>目标</div><div class="old">' + DB.goals.length + ' 个</div><div class="new">' + incoming.goals.length + ' 个</div>' +
       '<div>专注记录</div><div class="old">' + DB.sessions.length + ' 条</div><div class="new">' + incoming.sessions.length + ' 条</div>' +
+      '<div>倒数日</div><div class="old">' + DB.countdowns.length + ' 个</div><div class="new">' + incoming.countdowns.length + ' 个</div>' +
       '<div>累计时长</div><div class="old">' + fmtHM(DB.sessions.reduce(function(a,b){return a+b.seconds;},0)) + '</div><div class="new">' + fmtHM(incoming.sessions.reduce(function(a,b){return a+b.seconds;},0)) + '</div>' +
     '</div>' +
     (fileName ? '<p class="hint" style="margin-top:10px">来源文件：' + esc(fileName) + '</p>' : '');
@@ -2725,10 +3053,12 @@ function bindGlobal(){
     var d = new Date();
     $('#heroTime').textContent = pad(d.getHours()) + ':' + pad(d.getMinutes());
     $('#heroDate').textContent = dateLabel(d) + ' ' + weekdayLabel(d);
+    renderCountdownChip();   // 跨零点后自动刷新剩余天数
   }
   clock();
   setInterval(clock, 20000);
 
+  $('#cdChip').addEventListener('click', openCountdownSheet);
   $('#heroAdd').addEventListener('click', function(){ openGoalEditor(null); });
   $('#addGoalTile').addEventListener('click', function(){ openGoalEditor(null); });
   $('#tnAdd').addEventListener('click', function(){ openGoalEditor(null); });
@@ -2834,6 +3164,7 @@ function bindGlobal(){
         '<div>数据结构版本</div><div class="new" style="text-align:right">v' + SCHEMA + '</div><div></div>' +
         '<div>目标数量</div><div class="new" style="text-align:right">' + DB.goals.length + '</div><div></div>' +
         '<div>记录数量</div><div class="new" style="text-align:right">' + DB.sessions.length + '</div><div></div>' +
+        '<div>倒数日数量</div><div class="new" style="text-align:right">' + DB.countdowns.length + '</div><div></div>' +
         '<div>占用空间</div><div class="new" style="text-align:right">' + (function(){
           var b = 0; try { b = new Blob([JSON.stringify(DB)]).size; } catch(e){ b = JSON.stringify(DB).length; }
           return b < 1024 ? b + ' B' : (b/1024).toFixed(1) + ' KB';
